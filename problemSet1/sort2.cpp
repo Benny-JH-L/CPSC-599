@@ -9,7 +9,7 @@ int main()
     cin >> a >> b;
     
     if (a > b)
-        cout << a << " " << b << endl;
-    else 
         cout << b << " " << a << endl;
+    else 
+        cout << a << " " << b << endl;
 }
