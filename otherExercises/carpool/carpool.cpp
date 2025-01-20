@@ -9,30 +9,22 @@ Question link: https://open.kattis.com/problems/carpool
 #include <tuple>
 
 using namespace std;
+vector<tuple<int, int, int>> roadInputToRoadData(string roadINput);
 
 int main()
 {
     // I will need to use some sort of find the shortest path algorith, dijkstra's, FLoyd's etc.
-    string line, tmp;
-    cin >> line; // get first line containing 'n' and 'm'
+    
+    string line;
+    getline(cin, line);     // get first line containing 'n' and 'm'
     int n, m;
     istringstream iss(line);
-    bool gotN = false;
-    while (iss >> tmp)
-    {
-        // use ternery operator?
-        if (!gotN)
-        {
-            n = stoi(tmp);
-            gotN = true;
-        }
-        else
-            m = stoi(tmp);
-    }
+    iss >> n >> m;
+    cout << "n = " << n << "| m = " << m << endl;   // debug
 
     while (getline(cin, line) && line != "")
     {
-        roadInputToRoadData(line);
+        // roadInputToRoadData(line);
     }
 
     return 0;
