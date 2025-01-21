@@ -1,6 +1,7 @@
 /*
 Question link: https://open.kattis.com/problems/carpool
- */
+Note: Roads can be taken in both directions.
+*/
 
 #include <stdio.h>
 #include <sstream>
@@ -14,7 +15,7 @@ vector<tuple<int, int, int>> roadInputToRoadData(string roadINput);
 int main()
 {
     // I will need to use some sort of find the shortest path algorith, dijkstra's, FLoyd's etc.
-    
+
     string line;
     getline(cin, line);     // get first line containing 'n' and 'm'
     int n, m;
