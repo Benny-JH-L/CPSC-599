@@ -53,7 +53,6 @@ int main()
         }
         count++;
     }
-
     int numDiffCardsRecorded = map.size();
 
     // Case where ONLY two cards were never flipped and have the same picture -> can be sure they are matching

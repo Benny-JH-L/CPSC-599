@@ -10,6 +10,10 @@
         "format": "cpp",
         "list": "cpp",
         "xhash": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "tuple": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp",
+        "xutility": "cpp"
     }
 }
