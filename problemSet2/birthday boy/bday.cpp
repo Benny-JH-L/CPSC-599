@@ -12,6 +12,25 @@ https://ucalgary.kattis.com/courses/CPSC_599-4/Winter_2025/assignments/b7bqkq/pr
 
 using namespace std;
 
+static vector<int> monthsWith30Days = {4, 6, 9, 11};
+static vector<int> monthsWith31Days = {1, 3, 5, 7, 8, 10, 12};
+static unordered_map<int, int> daysInMonthMap;
+
+// calculates the number of days apart the b-day is 
+// from the end of the month
+int calcNumDaysFromBdayToEOM(int& month, int& day)
+{
+    int daysInMonth = daysInMonthMap[month];
+    return day - daysInMonth;
+}
+
+// calculates the number of days apart the b-day is 
+// from the start of the month
+int calcNumDaysFromBdayToSOM(int& month, int& day)
+{
+    return day - 1;
+}
+
 int main()
 {
     // testing
@@ -27,15 +46,11 @@ int main()
     // end of test
 
     // Create hash map that contains the # of days in each month
-    vector<int> monthsWith30Days = {4, 6, 9, 11};
-    vector<int> monthsWith31Days = {1, 3, 5, 7, 8, 10, 12};
-    unordered_map<int, int> daysInMonth;
-
     for (int i : monthsWith30Days)
-        daysInMonth[i] = 30;
+        daysInMonthMap[i] = 30;
     for (int i : monthsWith31Days)
-        daysInMonth[i] = 31;
-    daysInMonth[2] = 28;
+        daysInMonthMap[i] = 31;
+    daysInMonthMap[2] = 28;
 
     // Get employee birthdays and store into a hash map
     int numEmployee = 101, counter = 0;
@@ -106,9 +121,26 @@ int main()
         vector<int>* employeeBDaysAtMonth = &employeeBDaysMap[month];
         for (int i = 0; i < employeeBDaysAtMonth->size(); i++)
         {
-            auto [montOfEnd, dayOfEnd] = *compareBDayTuple;
+            auto [monthComp, dayComp] = *compareBDayTuple;
+            int employeeBdayDay = employeeBDaysAtMonth->at(i);
+            // case, b-days are in the same month
+            if (month == monthComp)
+            {
+                int newLength = employeeBdayDay - dayComp;  // compare the employee's b-day day with longest gap b-day day
+                newLength > lengthOfGapInDays ? lengthOfGapInDays = newLength : false;
+            }
+            // case, b-days are not in the same month
+            else 
+            {
+                int daysFromEndOfMonth = calcNumDaysFromBdayToEOM(monthComp, dayComp);
+                int daysFromStartOfMonth = calcNumDaysFromBdayToSOM(month, employeeBdayDay);
+
+                // calculate rest of days, ex. if jan to march, add the days in feb to daysFromEndOfMonth and daysFromStartOfMonth
+            }
         }
     }
+
+    // case, check b-days in dec to ones in jan
 
 
 
