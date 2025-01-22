@@ -123,10 +123,11 @@ int main()
         {
             auto [monthComp, dayComp] = *compareBDayTuple;
             int employeeBdayDay = employeeBDaysAtMonth->at(i);
+            int newLength = 0;
             // case, b-days are in the same month
             if (month == monthComp)
             {
-                int newLength = employeeBdayDay - dayComp;  // compare the employee's b-day day with longest gap b-day day
+                newLength = employeeBdayDay - dayComp;  // compare the employee's b-day day with longest gap b-day day
                 newLength > lengthOfGapInDays ? lengthOfGapInDays = newLength : false;
             }
             // case, b-days are not in the same month
@@ -134,8 +135,12 @@ int main()
             {
                 int daysFromEndOfMonth = calcNumDaysFromBdayToEOM(monthComp, dayComp);
                 int daysFromStartOfMonth = calcNumDaysFromBdayToSOM(month, employeeBdayDay);
-
+                newLength = daysFromEndOfMonth + daysFromStartOfMonth;
                 // calculate rest of days, ex. if jan to march, add the days in feb to daysFromEndOfMonth and daysFromStartOfMonth
+                for (int j = monthComp, counter = 0; counter < (monthComp - month); counter++, j++)
+                {
+                   newLength += daysInMonthMap[j];
+                }
             }
         }
     }
