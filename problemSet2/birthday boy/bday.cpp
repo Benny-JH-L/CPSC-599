@@ -10,8 +10,6 @@ https://ucalgary.kattis.com/courses/CPSC_599-4/Winter_2025/assignments/b7bqkq/pr
 #include <vector>
 #include <algorithm>    // for sorting algo.
 
-#define OCTOBER = 10;
-
 using namespace std;
 
 tuple<int, int> getNextBday(tuple<int, int> bday);
@@ -20,6 +18,7 @@ int calcGap(tuple<int, int> startingDate, tuple<int, int> endDate);
 
 static unordered_map<int, int> daysInMonthMap;
 static unordered_map<int, vector<int>> employeeBDaysMap; // first element is the month, second element is a vector of days
+static tuple<int, int> TODAY_DATE(10, 27);
 
 int main()
 {
@@ -143,13 +142,31 @@ int main()
         
         // debug
         auto [month, day] = nextBday;
+        auto [month2, day2] = bdayToCompareTuple;
+        cout << "Bday to comapre is Month: " << month2 << " | Day: " << day2 << endl;
         cout << "Bday after is Month: " << month << " | Day: " << day << endl;
         // end debug
 
+        int tmpGap = calcGap(bdayToCompareTuple, nextBday);
+
+        if (tmpGap > bdayGap)
+        {
+            bdayGap = tmpGap;
+        }
+        else if (tmpGap == bdayGap)
+        {
+            int g1 = calcGap(TODAY_DATE, nextBday);
+            int g2 = calcGap(TODAY_DATE, bdayToCompareTuple);
+
+            if (g1 < g2)
+                bdayToCompareTuple = nextBday;
+        }
+        bdayToCompareTuple = nextBday;
         c++;
-        break;  // keep this until implemented so it does not loop infinetly...
+        // break;  // keep this until implemented so it does not loop infinetly...
     }
 
+    
 
     return 0;
 }
@@ -276,3 +293,8 @@ int calcGap(tuple<int, int> startingDate, tuple<int, int> endDate)
     
 //     return gap;
 // }
+
+// 3
+// Henk 01-09
+// Pietje 11-11
+
