@@ -126,9 +126,9 @@ int main()
 
     cout << "tuple<1,9> == tuple<9,9> : " << (t1 == t2) << endl;
 
-    if (t1 == t2) 
+    if ((t1 == t2) == 0) 
     {
-        cout << "AHHHHH";
+        cout << "AHHHHH" << endl;
     }
 
     // end of debug--
@@ -140,6 +140,11 @@ int main()
     while ((bdayToCompareTuple != initialBDayTuple) == 1 || c == 1)
     {
         tuple<int, int> nextBday = getNextBday(bdayToCompareTuple);
+        
+        // debug
+        auto [month, day] = nextBday;
+        cout << "Bday after is Month: " << month << " | Day: " << day << endl;
+        // end debug
 
         c++;
         break;  // keep this until implemented so it does not loop infinetly...
@@ -155,30 +160,39 @@ tuple<int, int> getNextBday(tuple<int, int> bday)
 
     // counts how many elememts we've gone through in the hashmap, 
     //when this equals the hashmap size then we've gone through all elements
-    int hashMapCounter = 0, bDaysMapSize = employeeBDaysMap.size(); 
-   
-    for (int monthKey = initialM; hashMapCounter < employeeBDaysMap.size(); monthKey = (monthKey + 1) % 12)
+    bool nextBDayNotInCurrentMonth = true;
+
+    // find where bday is situated
+    for (int i = 0; i < employeeBDaysMap[initialM].size(); i++)
     {
-        // find where this bday is situated
-        int vectorSize = employeeBDaysMap[initialM].size();
-        for (int i = 0; i < vectorSize; i++)
+        int dayToCheck = employeeBDaysMap[initialM][i];
+        vector<int> vec = employeeBDaysMap[initialM];   // vector containing bday in that month
+        if (initialD == dayToCheck)
         {
-            int dayToCheck = employeeBDaysMap[initialM][i];
-            if (initialD == dayToCheck)
+            if (i + 1 < vec.size() && vec[i+1] != initialD)
             {
-                // see one note for cases
+                return make_tuple(initialM, dayToCheck);
             }
-        }  
+            else if (i + 1 >= vec.size())
+            {
+                nextBDayNotInCurrentMonth = false;
+                break;
+            }
+        }
     }
 
-
-    // for ()
-    // {
-    //     for (int index = 0; index < employeeBDaysMap[].size(); index++)
-    //     {
-
-    //     }
-    // }
+    if (!nextBDayNotInCurrentMonth)
+    {
+        int hashMapCounter = 0;
+        for (int monthKey = initialM + 1; ; monthKey = (monthKey + 1) % 12)
+        {
+            if (employeeBDaysMap.count(monthKey) && employeeBDaysMap[monthKey].size() > 0)
+                return make_tuple(monthKey, employeeBDaysMap[monthKey][0]); // return the first b-day after input b-day 
+            else if (monthKey == initialM)
+                return bday; // Case of one b-day, return itself
+        }
+    }
+   
 }
 
 int calcDaysBetweenMonths(int startMonth, int endMonth)
