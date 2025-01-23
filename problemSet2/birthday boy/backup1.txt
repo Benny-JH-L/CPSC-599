@@ -135,9 +135,9 @@ int main()
     // calculate longest b-day gap that's closest to Oct 27 but that's also after it.
     tuple<int, int> bdayToCompareTuple = initialBDayTuple; // first elem is month, second elem is day
     tuple<int, int> longestRunningBday = initialBDayTuple;
-    int bdayGap = 0, c = 0;
+    int bdayGap = 0, c = 1;
 
-    while (c < numEmployee)
+    while ((bdayToCompareTuple != initialBDayTuple) == 1 || c == 1)
     {
         tuple<int, int> nextBday = getNextBday(bdayToCompareTuple);
         int tmpGap = calcGap(bdayToCompareTuple, nextBday);
