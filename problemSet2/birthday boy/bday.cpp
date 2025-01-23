@@ -18,7 +18,7 @@ tuple<int, int> getNextBday(tuple<int, int> bday);
 int calcDaysBetweenMonths(int startMonth, int endMonth);
 int calcGap(tuple<int, int> startingDate, tuple<int, int> endDate);
 
-static unordered_map<int, int> daysInMonth;
+static unordered_map<int, int> daysInMonthMap;
 static unordered_map<int, vector<int>> employeeBDaysMap; // first element is the month, second element is a vector of days
 
 int main()
@@ -40,10 +40,10 @@ int main()
     vector<int> monthsWith31Days = {1, 3, 5, 7, 8, 10, 12};
 
     for (int i : monthsWith30Days)
-        daysInMonth[i] = 30;
+        daysInMonthMap[i] = 30;
     for (int i : monthsWith31Days)
-        daysInMonth[i] = 31;
-    daysInMonth[2] = 28;
+        daysInMonthMap[i] = 31;
+    daysInMonthMap[2] = 28;
 
     // Get employee birthdays and store into a hash map
     int numEmployee = 101, counter = 0;
@@ -133,6 +133,7 @@ int main()
 
     // end of debug--
 
+    // calculate longest b-day gap that's closest to Oct 27 but that's also after it.
     tuple<int, int> bdayToCompareTuple = initialBDayTuple; // first elem is month, second elem is day
     int bdayGap = 0, c = 1;
 
@@ -141,9 +142,9 @@ int main()
         tuple<int, int> nextBday = getNextBday(bdayToCompareTuple);
 
         c++;
+        break;  // keep this until implemented so it does not loop infinetly...
     }
 
-    // calculate longest b-day gap that's closest to Oct 27 but that's also after it.
 
     return 0;
 }
@@ -165,16 +166,7 @@ tuple<int, int> getNextBday(tuple<int, int> bday)
             int dayToCheck = employeeBDaysMap[initialM][i];
             if (initialD == dayToCheck)
             {
-                // Case where there is no duplicate b-day right after it in the vector
-                // if (i + 1 < vectorSize && employeeBDaysMap[initialM][i+1] != initialD)
-                // {
-
-                // }
-                // // Case where there is a duplicate b-day is right after it in the vector -> continue loop
-                // else if ()
-                // {
-
-                // }
+                // see one note for cases
             }
         }  
     }
@@ -197,7 +189,7 @@ int calcDaysBetweenMonths(int startMonth, int endMonth)
 	    numMonthsBetween++;
     
     for (int currentMonth = startMonth + 1, counter = 0; counter < numMonthsBetween; counter++, currentMonth = (currentMonth + 1) % 12)
-		numDays += daysInMonth[currentMonth];
+		numDays += daysInMonthMap[currentMonth];
 
     return numDays;
 }
@@ -211,7 +203,7 @@ int calcGap(tuple<int, int> startingDate, tuple<int, int> endDate)
     if (startingM != endM)
     {
         int numDaysFromFirstOfMonth = endD - 1;
-        int numDaysFromEndOfMonth = daysInMonth[startingM] - startingD;
+        int numDaysFromEndOfMonth = daysInMonthMap[startingM] - startingD;
         
         gap = numDaysFromEndOfMonth + calcDaysBetweenMonths(startingM, endM) + numDaysFromFirstOfMonth;
     }
