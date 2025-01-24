@@ -67,8 +67,8 @@ int main()
         }
         else if (tmpGap == gap) // get day that is cloests to Oct 27.
         {
-            int tmp1 = abs(currentDay - dayOfLongestGap);
-            int tmp2 = abs(currentDay - employeeBDaysInDays[i + 1]);
+            int tmp1 = currentDay - dayOfLongestGap;
+            int tmp2 = currentDay - employeeBDaysInDays[i + 1];
 
             if (tmp1 <= tmp2)
                 dayOfLongestGap = tmp1;
