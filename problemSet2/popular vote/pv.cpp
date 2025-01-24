@@ -61,7 +61,6 @@ int main()
         for (int v : candidateVotesVector)
             v == highestVoteCount ? numTimesHighestVoteOccures++ : false;
         
-        string winnerType = "";
         if (numTimesHighestVoteOccures > 1)
             outputVector.push_back("no winner");
         else if ((float)highestVoteCount > (totalVotes / 2.f))

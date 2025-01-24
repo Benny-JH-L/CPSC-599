@@ -56,8 +56,18 @@ int main()
     int numDiffCardsRecorded = map.size();
 
     // Case where ONLY two cards were never flipped and have the same picture -> can be sure they are matching
-    if (numCards/2 - numDiffCardsRecorded == 1 && numCards - positionsChecked.size() == 2)
-        numPairs++;
+    // if (numCards/2 - numDiffCardsRecorded == 1 && numCards - positionsChecked.size() == 2)
+    //     numPairs++;
+    
+    // Case where we know the position of HALF of the unique cards (and their positions). 
+    // for example if we know 5 unique card positions out of 10 cards, we can flip an unknown card and match it with a
+    // card we flipped before.
+    int numUniqueCards = numCards/2;
+    if (numCards - numDiffCardsRecorded == numUniqueCards && numCards - positionsChecked.size() == numUniqueCards)
+    {
+        for (int count = 0; count < numUniqueCards; count++)
+            numPairs++;
+    }
     // Case where there are 2 positions that were never flipped and we have 2 different cards with no pairs (we can infer 2 pairs)
     int i = 0;
     for (auto mapping : map)
@@ -93,3 +103,17 @@ int main()
 
     return 0;
 }
+
+// Own test cases:
+
+// 10 
+// 3
+// 1 2 s e
+// 3 4 k o
+// 5 4 j o
+// expected output: 5
+
+// 4 
+// 1
+// 1 2 j k
+// expected output: 2
