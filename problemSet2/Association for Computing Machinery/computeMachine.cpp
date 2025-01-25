@@ -1,18 +1,20 @@
 
 /*
 https://open.kattis.com/problems/acm2
+
+passed all cases.
 */
 
 #include <stdio.h>
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 int main()
 {
     // Go through input
-
     string firstInput, secondInput;
     int numberOfProblems = 0, indexOfFirstToSolve = -1;
     getline(cin, firstInput);
@@ -23,27 +25,34 @@ int main()
 
     int time = -1;
     vector<int> timeEstimationsVector;
-    while (iss >> time) // put times of each problem into a vector
+    while (iss >> time) // put time estimations of each problem into a vector
     {
         timeEstimationsVector.push_back(time);
-        cout << time << endl; // debug
+        // cout << time << endl; // debug
     }
 
     int numAccepted = 0, totalPenalty = 0;
-    if (timeEstimationsVector[indexOfFirstToSolve] > 300)
+    if (timeEstimationsVector[indexOfFirstToSolve] <= 300)
     {
-        cout << numAccepted << " " << totalPenalty << endl;
-    }
-    else
-    {
-        totalPenalty = timeEstimationsVector[indexOfFirstToSolve];  // set the total penalty
-        timeEstimationsVector[indexOfFirstToSolve] = 999;           // question solved, so we don't want to add it again
+        int totalTimePassed = timeEstimationsVector[indexOfFirstToSolve]; 
+        totalPenalty = totalTimePassed;  // set the total penalty
+        numAccepted++;
+        timeEstimationsVector[indexOfFirstToSolve] = 1000;          // question solved, so we don't want to add it again
+        sort(timeEstimationsVector.begin(), timeEstimationsVector.end());   // sort by ascending
+
         // calculate penalty time
         for (int i = 0; i < timeEstimationsVector.size(); i++)
         {
-            // find the min value in vector, then add it to penalty
+            if (totalTimePassed + timeEstimationsVector[i] > 300)
+                break;
+            
+            numAccepted++;
+            totalTimePassed += timeEstimationsVector[i];
+            totalPenalty += totalTimePassed;
         }
     }
+
+    cout << numAccepted << " " << totalPenalty << endl;
 
     return 0;
 }
