@@ -1,4 +1,9 @@
 
+/*
+https://open.kattis.com/problems/memorymatch 
+Passed all tests.
+*/
+
 #include <stdio.h>
 #include <iostream>
 #include <sstream>
@@ -48,27 +53,26 @@ int main()
 
     // checking cases
     int totalNumUniqueCards = numCards / 2, numCertainPairs = 0, numPositionsChecked = positionsCheckedSet.size();
+
     if (numCards == 2 && numRounds == 0)
         numCertainPairs++;
-    else if (totalNumUniqueCards - 1 == numUniqueCardsRevealed && numCards - numPositionsChecked == 2)  // case where totalnumunqiecards - 1 are revealed and there are exactly 2 positions left unchecked
-        numCertainPairs++;
-    else if (totalNumUniqueCards == numUniqueCardsRevealed && numCards - numPositionsChecked == 2) // case where totalnumunqiecards are revealed and there are exactly 2 positions left unchecked where the 2 positions hold two different cards
-        numCertainPairs += 2;
-    else if (numUniqueCardsRevealed == totalNumUniqueCards && numPositionsChecked == totalNumUniqueCards) // case where every unique card has been revealed.
+    else if (numCards - numPositionsChecked == 2)
     {
-        numCertainPairs += numUniqueCardsRevealed;
+        if (totalNumUniqueCards - 1 == numUniqueCardsRevealed) // case where totalnumunqiecards - 1 are revealed and there are exactly 2 positions left unchecked
+            numCertainPairs++;
+        else    // case where totalnumunqiecards are revealed and there are exactly 2 positions left unchecked where the 2 positions hold two different cards
+            numCertainPairs += 2;
+    }
+    else if (numUniqueCardsRevealed == totalNumUniqueCards) // case where every unique card has been revealed.
+    {
         for (auto mapping : map)
-            mapping.second.size() == 2 ? numCertainPairs-- : false;  // if the set is of size 2 then we can make a pair, subtract so we don't double count
+            mapping.second.size() == 1 ? numCertainPairs++ : false; // if only one position of the card has been revealed, we can still make a pair
     }
 
     for (auto mapping : map)
-    {
         mapping.second.size() == 2 ? numCertainPairs++ : false;     // if the set is of size 2 then we can make a pair
-    }
     
     cout << numCertainPairs << endl;
 
     return 0;
 }
-
-think of a test case that can cover muiltiple cases
