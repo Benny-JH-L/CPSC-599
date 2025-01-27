@@ -1,8 +1,6 @@
 
 /*
 https://ucalgary.kattis.com/courses/CPSC_599-4/Winter_2025/assignments/b7bqkq/problems/birthdayboy
-
-Passed all tests!
 */
 
 #include <stdio.h>
@@ -115,6 +113,11 @@ int main()
         daysInMonthMap[i] = 31;
     daysInMonthMap[2] = 28;
 
+    // testing
+    // gapTest();
+    // nextBdayTest();
+    // end of test
+
     // Get employee birthdays and store into a hash map
     int numEmployee = 101, counter = 0;
     string line;
@@ -177,6 +180,7 @@ int main()
     // cout << "\nThe longest running bday (makes longest gap) is: " << longestRunningMonth << '-' << longestRunningDay << endl;
 
     // calc Bobby's fake b-day
+    // int bobbybdayM = -1, bobbybdayD = -1;
     tuple<int, int> bobbybday(-1, -1);
 
     if (longestRunningDay - 1 < 1)  // longest running bday is on the first of the month
@@ -199,4 +203,96 @@ int main()
         bobbyFakeD = "0" + to_string(bobbyD); 
     
     cout << bobbyFakeM << '-' << bobbyFakeD << endl; 
+    // cout << "Bobby's fake bday: " << bobbyM << '-' << bobbyD << endl;    // debug
+}
+
+void gapTest()
+{
+    tuple<int, int> oct27(10, 27); // NOTE: a b-day can also occur today (Oct 27)!
+
+    tuple<int, int> dec31(12, 31);
+    tuple<int, int> jan1(1, 1);
+    tuple<int, int> feb1(2, 1);
+    tuple<int, int> march1(3, 1);
+    calcGap(jan1, dec31); // expected 365 - 2 = 363
+    calcGap(dec31, jan1); // expected 0
+    calcGap(dec31, feb1); // expected 31
+    calcGap(dec31, march1); // expected 59
+    cout << endl;
+
+    
+    tuple<int, int> jan9(1, 9);
+    tuple<int, int> sept20(9, 20);
+    tuple<int, int> nov11(11, 11);
+    calcGap(jan9, sept20); // expected 253
+    calcGap(sept20, nov11); // expected 51
+    calcGap(oct27, nov11); // expected 14
+    calcGap(nov11, jan9);
+    cout << endl;
+
+    cout << "---" << endl;
+    tuple<int, int> april29(4, 29);
+    tuple<int, int> oct28(10, 28);
+    tuple<int, int> april28(4, 28);
+    calcGap(april28, april29); // expected
+    calcGap(april29, oct28); // expected
+    calcGap(oct27, oct28); // expected (START FINDING B-DAYS FROM OCT 27)
+    calcGap(oct28, april28); // expected
+    cout << endl;
+    calcGap(april29, oct28);
+    calcGap(oct27, oct28);
+    calcGap(oct27, april28);
+    cout << "---" << endl;
+
+    cout << "---" << endl;
+    tuple<int, int> april30(4, 30);
+    tuple<int, int> oct29(10, 29);
+    // tuple<int, int> april29(4, 29); // already defined
+    calcGap(april29, april30); // expected
+    // calcGap(april30, oct27); // expected 179
+    calcGap(april30, oct29); // expected 181
+    calcGap(oct27, oct29); // expected
+    calcGap(oct29, april29); // expected 181
+    cout << endl;
+    calcGap(april30, oct29); // expected 181
+    // calcGap(oct27, oct29); // expected 1
+    calcGap(oct27, april29); // expected 183
+    cout << "---" << endl;
+
+
+    calcGap(oct27, oct28);
+    calcGap(oct28, oct28);
+}
+
+void addTupleToBdayMap( tuple<int, int> tup)    // helper function
+{
+    auto [key, day] = tup;
+    bdayMap[key].insert(day);
+}
+
+void nextBdayTest()
+{
+    bdayMap.clear();
+
+    // when there are 'no' bdays
+    tuple<int, int> oct27(10, 27); // NOTE: a b-day can also occur today (Oct 27)!
+    getNextbday(oct27);
+
+    // when there is 1 bday
+    cout << endl;
+    addTupleToBdayMap(oct27);
+    getNextbday(oct27);
+    bdayMap.clear();
+
+    cout << endl;
+    tuple<int, int> jan9(1, 9);
+    tuple<int, int> sept20(9, 20);
+    tuple<int, int> nov11(11, 11);
+    addTupleToBdayMap(jan9);
+    addTupleToBdayMap(sept20);
+    addTupleToBdayMap(nov11);
+    getNextbday(jan9);          // expected is 9-20
+    getNextbday(sept20);         // expected is 11-1
+    getNextbday(nov11);         // expected is 1-9
+    bdayMap.clear();
 }
