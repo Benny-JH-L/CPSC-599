@@ -1,7 +1,7 @@
 
 /*
 https://ucalgary.kattis.com/courses/CPSC_599-4/Winter_2025/assignments/ot4ggf/problems/tutorial
-
+Passed all tests!
 */
 
 #include <stdio.h>
@@ -27,7 +27,7 @@ int main()
     iss >> m >> n >> t;
 
     // unsigned long long int algorithmRunTime = 1;
-    double algorithmRunTime = 1;
+    double algorithmOperations = 1;
 
     vector<long long int> squares = {1, 2}; // 4, 8, 16
     vector<long long int> powers = {0, 1}; // 2, 3, 4
@@ -37,24 +37,26 @@ int main()
     {
         case 1: // n!
 
-            if (n >= 14)    // 14! is larger then the largest m value.
-                cout << "TLE" << endl;
-            else 
-                cout << "AC" << endl;
-
-            // return 0;
-            // for (size_t i = n; i > 0; i--)
-            //     algorithmRunTime *= i;
-
-        break;
-        case 2: // 2^n, ex. 2^13 = 2^8 * 2^4 * 2^1 (using repeated squareing method)
-
-            if (n >= 30)
+            if (n >= 13)    // 13! = 6227020800 (14! = 87178291200) is larger then the largest possible m value of 10^9.
             {
                 cout << "TLE" << endl;
-                return;
+                return 0;
+            }
+
+            // Calculate n! (for n < 13)
+            for (size_t i = n; i > 0; i--)
+                algorithmOperations *= i;
+
+        break;
+        case 2: // 2^n
+
+            if (n >= 30)    // 2^30 = 1073741824 which is > m's largest possible value of 10^9
+            {
+                cout << "TLE" << endl;
+                return 0;
             }  
 
+            // Calculate 2^n, for n < 30 using repeated squareing method ex. 2^13 = 2^8 * 2^4 * 2^1 
             for (long long int power = 2; true; power = power * 2)
             {
                 if (power <= n)
@@ -75,7 +77,7 @@ int main()
             
             if (powers[powers.size() - 1] == n)
             {
-                algorithmRunTime = squares[squares.size() - 1];
+                algorithmOperations = squares[squares.size() - 1];
                 calcTime = false;
             }
             // calc run time
@@ -84,32 +86,56 @@ int main()
                 if (powers[index] <= n)
                 {
                     n -= powers[index];
-                    algorithmRunTime *= squares[index];
+                    algorithmOperations *= squares[index];
                 }
             }
 
         break;
-        case 3: // n^4      // find the number 'n' such that n^4 >= 10^9 
+        case 3: // n^4
+
+            if (n >= 178)   // 178^4 = 1003875856 > 10^9
+            {
+                cout << "TLE" << endl;
+                return 0;
+            }
+
             for (int i = 0; i <= 3; i++)
-                algorithmRunTime *= n;
+                algorithmOperations *= n;
             
         break;
-        case 4: // n^3 // find the number 'n' such that n^3 >= 10^9 
+        case 4: // n^3 
+
+            if (n > 1000)   // 1000^3 = 10^9
+            {
+                cout << "TLE" << endl;
+                return 0;
+            }
+
             for (int i = 0; i <= 2; i++)
-                algorithmRunTime *= n;
+                algorithmOperations *= n;
         break;
-        case 5: // n^2 // find the number 'n' such that n^2 >= 10^9 
-            algorithmRunTime = n * n;
+        case 5: // n^2 
+
+            if (n >= 31623)   // 31623^2 = 1000014129 > 10^9
+            {
+                cout << "TLE" << endl;
+                return 0;
+            }
+
+            algorithmOperations = n * n;
+
         break;
         case 6: // n*log2(n)
-            algorithmRunTime = n * log2(n);
+            algorithmOperations = n * log2(n);
+
         break;
         case 7: // n
-            algorithmRunTime = n;
+        
+            algorithmOperations = n;
         break;
     }
 
-    if (algorithmRunTime <= m)
+    if (algorithmOperations <= m)
         cout << "AC" << endl;
     else 
         cout << "TLE" << endl;
