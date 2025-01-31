@@ -105,7 +105,8 @@ int main()
                 else if (numberOfPayments + 1 >= 1200)
                 {
                     outputVector.push_back(-1);
-                    // cout << "number of payments before we find it as impossible: " << numberOfPayments << endl; // debug
+                    // cout << "number of payments before we find it as impossible: " << numberOfPayments + 1 << endl; // debug
+                    // cout << "remaining balance: " << outstandingBalance << endl;    //debug
                     break;
                 }
             }
