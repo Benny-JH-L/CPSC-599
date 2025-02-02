@@ -4,6 +4,7 @@ https://open.kattis.com/problems/anothercandies?tab=metadata
 
 2^63 = 9223372036854775808
 
+Passed all Tests!
 */
 
 #include <stdio.h>
@@ -36,6 +37,8 @@ int main()
 
         while (count2 < numChildren && getline(cin, input))
         {
+            iss = istringstream(input);
+            iss >> numCandy;
             if (count2 + 1 >= numChildren)
             {
                 if ((sum + numCandy) % numChildren == 0)
@@ -46,8 +49,6 @@ int main()
                 output.push_back("NO");
                 break;
             }
-            iss = istringstream(input);
-            iss >> numCandy;
             sum += (numCandy % numChildren);
 
             count2++;
