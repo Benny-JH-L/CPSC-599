@@ -58,6 +58,7 @@
         "xloctime": "cpp",
         "xmemory": "cpp",
         "xtr1common": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "numeric": "cpp"
     }
 }
