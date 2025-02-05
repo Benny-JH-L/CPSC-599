@@ -1,0 +1,141 @@
+
+/*
+https://ucalgary.kattis.com/courses/CPSC_599-4/Winter_2025/assignments/j7jr2g/problems/primesieve
+
+FIRST ATTEMPT 1: MEMORY EXCEEDED
+*/
+
+#include<stdio.h>
+#include<sstream>
+#include<iostream>
+#include<unordered_map>
+#include<tuple>
+#include<vector>
+
+using namespace std;
+
+/// @brief Calculates the prime factors of the number `n`.
+/// @param n the number to be prime factored, an `int`.
+/// @return `std::vector<std::tuple<int, int>>` containing the prime factor's and their exponents.
+/// `std::tuple<int, int>`: `first element` contains the `prime number`, `second element` contains its `exponent`.
+vector<tuple<int, int>> primeFactorize(int n)
+{
+    // HashMap: Key is the prime factor, value at key is the exponent value
+    unordered_map<int, int> primeFactorsMap;
+
+    while (n % 2 == 0)
+    {
+        primeFactorsMap[2]++;
+        n = n / 2;
+    }
+
+    // because 'n' is odd when entering the for-loop
+    // we add 2 to i after every iteration.
+    for (int i = 3; i*i <= n; i = i + 2)
+    {
+        while (n % i == 0)
+        {
+            primeFactorsMap[i]++;
+            n = n / i;
+        }
+    }
+
+    // convert the hashmap into a vector<tuple>
+    vector<tuple<int, int>> returnVector;
+
+    if (primeFactorsMap.size() == 0)    // case where `n` is prime itself
+    {
+        returnVector.push_back(tuple(n, 1));
+        return returnVector;
+    }
+
+    for (auto pair : primeFactorsMap)
+        returnVector.push_back(tuple(pair.first, pair.second));
+    return returnVector;
+}
+
+/// @brief Finds all the prime numbers that are <= `n` and puts them into the `vector<long long int>& primesLessThanN`. Run time of `O(sqrt(n) * log(log (n)))`.
+/// @param n an `int`.
+/// @param primesLessThanN a `vector<long long int>&`.
+void SieveOfEratosthenes(long long int n, vector<long long int>& primesLessThanN)
+{
+    primesLessThanN.clear();    // clear the vector, so no mistakes are made
+
+    // This vector<bool> will store which numbers are prime, 
+    // if it is true at index `i` then `i` is a prime number
+    // initialize vector<bool> from [0..n] to true
+    vector<bool> primes(n + 1, true);
+
+    // Find the prime numbers <= `n`
+    for (int i = 2; i * i <= n; i++)
+    {
+        // check if `true`, if so then `i` is prime and
+        // remove all numbers that are divisible by `i`
+        if (primes[i])  
+        {
+            // start removing at i^2, then continue by adding `i` to itself (`r` will be powers of `i`)
+            for (int r = i * i; r <= n; r += i) 
+                primes[r] = false;              // set false to remove
+        }
+    }
+
+    // Send back the primes less than `n`
+    for (int p = 2; p <= n; p++)
+    {
+        if (primes[p])
+            primesLessThanN.push_back(p);
+    }
+}
+
+int main()
+{
+    // test
+    // vector<tuple<int, int>> test = primeFactorize(9973);
+    // cout << "number of primes that make up " <<9973<<" is: " << test.size() << endl;
+    // vector<long long int> tmp;
+    // SieveOfEratosthenes(9973, tmp);
+    // cout << "number of primes <= " << 9973 << " is: " << tmp.size() << endl;
+    
+    string input;
+
+    getline(cin, input);
+    istringstream iss(input);
+    long long int n;
+    int q;
+    iss >> n >> q;
+
+    vector<string> outVec;
+    vector<long long int>* primesLessThanN = new vector<long long int>();
+    SieveOfEratosthenes(n, *primesLessThanN);
+    outVec.push_back(to_string(primesLessThanN->size()));    // 1st line is number of primes <= `n`
+    delete primesLessThanN; // help save memory
+
+    int counter = 0;
+
+    while(counter < q && getline(cin, input))
+    {
+        iss = istringstream(input);
+        long long int x;
+        iss >> x;
+
+        if (x == 1) // special case, due to how my `primeFactorize(n)` deals with input as primes (returns `n`)
+            outVec.push_back("0");
+        else
+        {
+            vector<tuple<int,int>> primeFactorsOfX = primeFactorize(x);
+            auto [base, expo] = primeFactorsOfX[0];
+            if (primeFactorsOfX.size() == 1 && expo == 1)    // `x` is a prime number (factors of prime number will be itself, x^1 or 1, tho i don't include 1)
+                outVec.push_back("1");
+            else                                // `x` is not a prime number
+                outVec.push_back("0");
+        }
+
+        counter++;
+    }
+
+    // print results
+    for (string s : outVec)
+        cout << s << endl;
+
+    return 0;
+}

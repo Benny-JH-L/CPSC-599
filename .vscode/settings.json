@@ -60,5 +60,6 @@
         "xtr1common": "cpp",
         "*.tcc": "cpp",
         "numeric": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

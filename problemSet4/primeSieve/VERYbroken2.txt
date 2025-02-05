@@ -1,0 +1,245 @@
+
+/*
+https://ucalgary.kattis.com/courses/CPSC_599-4/Winter_2025/assignments/j7jr2g/problems/primesieve
+
+*/
+
+#include<stdio.h>
+#include<sstream>
+#include<iostream>
+#include<unordered_map>
+#include<tuple>
+#include<vector>
+#include<set>
+
+using namespace std;
+
+/// @brief Calculates the prime factors of the number `n`.
+/// @param n the number to be prime factored, an `long long int`.
+/// @param primeFactorsOfN prime factors of `n` are put in here, a `vector<tuple<long long int, long long int>>&`.
+/// `std::tuple<long long int, long long int>`: `first element` contains the `prime number` (base), `second element` contains the base's `exponent`.
+void primeFactorize(long long int n, vector<tuple<long long int, long long int>>& primeFactorsOfN)
+{
+    // HashMap: Key is the prime factor, value at key is the exponent value
+    unordered_map<long long int, long long int> primeFactorsMap;
+
+    while (n % 2 == 0)
+    {
+        primeFactorsMap[2]++;
+        n = n / 2;
+    }
+
+    // because 'n' is odd when entering the for-loop
+    // we add 2 to i after every iteration.
+    for (int i = 3; i*i <= n; i = i + 2)
+    {
+        while (n % i == 0)
+        {
+            primeFactorsMap[i]++;
+            n = n / i;
+        }
+    }
+
+    // convert the hashmap into a vector<tuple>
+    // if (primeFactorsMap.size() == 0)    // case where `n` is prime itself
+    if (n > 2)    // case where `n` is prime itself (and greater than 2)
+        primeFactorsOfN.push_back(tuple(n, 1));
+
+    for (auto pair : primeFactorsMap)
+        primeFactorsOfN.push_back(tuple(pair.first, pair.second));
+}
+
+/// @brief Finds all the prime numbers that are <= `n` and puts them into the `vector<long long int>& primesLessThanN`. Run time of `O(sqrt(n) * log(log (n)))`.
+/// @param n a `const long long int&`.
+/// @param primesLessThanN prime numbers <= `n` are put in here, a `vector<long long int>&`.
+/// This is an altered version to help reduced memory usage.
+int SieveOfEratosthenes(const long long int& n)//, vector<long long int>& primesLessThanN)
+{
+    // primesLessThanN.clear();    // clear the vector, so no mistakes are made
+
+    if (n == 1)
+        return 0;
+
+    // This vector<bool> will store which numbers are prime, 
+    // if it is true at index `i` then `i` is a prime number
+    // initialize vector<bool> from [0..n] to true
+    vector<bool> primes(n + 1, true);
+
+    // Find the prime numbers <= `n`
+    for (int i = 2; i * i <= n; i++)
+    {
+        // check if `true`, if so then `i` is prime and
+        // remove all numbers that are divisible by `i`
+        if (primes[i])  
+        {
+            // start removing at i^2, then continue by adding `i` to itself (`r` will be powers of `i`)
+            for (int r = i * i; r <= n; r += i) 
+                primes[r] = false;              // set false to remove
+        }
+    }
+
+    // Send back the primes less than `n`
+    int numPrimesLessThanEqN = 0;
+    for (int p = 2; p <= n; p++)
+    {
+        if (primes[p])
+            // primesLessThanN.push_back(p);
+            numPrimesLessThanEqN++;
+    }
+    return numPrimesLessThanEqN;
+}
+
+void printVector(vector<tuple<long long int, long long int>> vector)
+{
+    for (int i = 0; i < vector.size(); i++)
+    {
+        auto [base, expo] = vector[i];
+        cout << "[" << i << "]: " << base << "^" << expo  << endl;
+    }
+}
+
+int main()
+{
+    // test
+    vector<tuple<long long int, long long int>> t1;
+    primeFactorize(2, t1);
+    auto [base1, expo1] = t1[0];
+    // cout << base1 << " " << expo1 << endl;
+
+    // vector<tuple<int, int>> test = primeFactorize(9973);
+    // cout << "number of primes that make up " <<9973<<" is: " << test.size() << endl;
+    // vector<long long int> tmp;
+    // SieveOfEratosthenes(9973, tmp);
+    // cout << "number of primes <= " << 9973 << " is: " << tmp.size() << endl;
+    
+    string input;
+
+    getline(cin, input);
+    istringstream iss(input);
+    long long int n;    // 1 <= n <= 10e8 (10^8)
+    int q;  // 1 <= q <= 20 000
+    iss >> n >> q;
+
+    vector<string> outVec;
+    int counter = 0;
+
+    // number of primes <= n is computed later
+
+    unordered_map<int, set<long long int>> mapOfResults;    // key is 0 or 1; value will be the `x` values
+
+    while(counter < q && getline(cin, input))
+    {
+        iss = istringstream(input);
+        long long int x;    // 1 <= x <= n
+        iss >> x;
+
+        bool foundIn0 = false, foundIn1 = false;
+
+        for (long long int val : mapOfResults[0])
+        {
+            if (val == x)
+            {
+                outVec.push_back("hey0");
+                outVec.push_back("0");
+                foundIn0 = true;
+                break;
+            }
+        }
+
+        if (!foundIn0)
+        {
+            for (long long int val : mapOfResults[1])
+            {
+                if (val == x)
+                {
+                    outVec.push_back("hey1");
+                    outVec.push_back("1");
+                    foundIn1 = true;
+                    break;
+                }
+            }
+        }
+
+        vector<tuple<long long int, long long int>> primeFactors;
+        if (!foundIn0 && !foundIn1)
+        {
+            primeFactorize(x, primeFactors);
+
+            printVector(primeFactors);
+
+            auto [base, expo] = primeFactors[0];
+            cout << base << " " << expo << endl;
+            if (primeFactors.size() == 1 && expo == 1)  // `x` is prime
+            {
+                outVec.push_back("1");
+                mapOfResults[1].insert(x);
+            }
+            else
+            {
+                outVec.push_back("0");
+                mapOfResults[0].insert(x);
+            }
+        }
+
+        counter++;
+    }
+
+    // compute this last to `save` memory for above computation
+    // vector<long long int>* primesLessThanN = new vector<long long int>();
+    // SieveOfEratosthenes(n, *primesLessThanN);    
+    // cout << primesLessThanN->size() << endl;
+    // delete primesLessThanN;
+
+    cout << to_string(SieveOfEratosthenes(n)) << endl;
+
+    // print results
+    for (string s : outVec)
+        cout << s << endl;
+
+    return 0;
+}
+
+    // unordered_map<int, int> daysInMonthMap;
+    // unordered_map<string, string> mapOfResults;  // store results of previous `x` results, so we don't have to recompute them every time
+    // unordered_map<long long int, string> mapOfResults;  // store results of previous `x` results, so we don't have to recompute them every time
+
+        // if (x == 1) // special case, due to how my `primeFactorize(n)` deals with input as primes (returns `n`)
+        //     outVec.push_back("0");
+        // else
+        // {
+        //     long long int copyOfX = x;
+        //     if (mapOfResults.count(copyOfX) && mapOfResults[copyOfX] == "")
+        //     // if (mapOfResults.count(copyOfX) && mapOfResults.at(copyOfX) == "")
+        //     // if (mapOfResults.count(to_string(x)) && mapOfResults.at(to_string(x)) == "")
+        //     {
+        //         // outVec.push_back("HI :)");  // debug
+        //         vector<tuple<long long int, long long int>> primeFactorsOfX;
+        //         primeFactorize(x, primeFactorsOfX);
+        //         auto [base, expo] = primeFactorsOfX[0];
+        //         if (primeFactorsOfX.size() == 1 && expo == 1)    // `x` is a prime number (factors of prime number will be itself, x^1 or 1, tho i don't include 1 while checking)
+        //         {
+        //             outVec.push_back("1");
+        //             mapOfResults[copyOfX] = "1";
+        //             // outVec.push_back("HI1 :)");  // debug
+
+        //             // mapOfResults.insert({copyOfX, "1"});
+        //             // mapOfResults.insert({to_string(x), "1"});
+        //         }    
+        //         else                                // `x` is not a prime number
+        //         {
+        //             outVec.push_back("0");
+        //             mapOfResults[copyOfX] = "0";
+        //             // outVec.push_back("HI0 :)");  // debug
+
+        //             // mapOfResults.insert({copyOfX, "0"});
+        //             // mapOfResults.insert({to_string(x), "0"});
+        //         }
+
+        //         // debug
+        //         // outVec.push_back("map[" + to_string(x) + "] = " + mapOfResults.at(copyOfX));
+        //     }
+        //     else
+        //         outVec.push_back(mapOfResults[copyOfX]);
+        //         // outVec.push_back(mapOfResults.at(to_string(x)));
+        // }
+
