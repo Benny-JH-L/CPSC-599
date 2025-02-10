@@ -3,6 +3,7 @@
 https://ucalgary.kattis.com/courses/CPSC_599-4/Winter_2025/assignments/j7jr2g/problems/candydistribution
 https://open.kattis.com/problems/candydistribution?tab=metadata 
 
+Passed all tests!
 */
 
 #include<stdio.h>
@@ -21,7 +22,7 @@ using namespace std;
 /// @param n the number to be prime factored, an `long long int`.
 /// @param primeFactorsOfN prime factors of `n` are put in here, a `vector<tuple<long long int, long long int>>&`.
 /// `std::tuple<long long int, long long int>`: `first element` contains the `prime number` (base), `second element` contains the base's `exponent`.
-void primeFactorize(size_t n, vector<tuple<long long int, long long int>>& primeFactorsOfN)
+void primeFactorize(size_t n, vector<tuple<size_t, size_t>>& primeFactorsOfN)
 {
     // HashMap: Key is the prime factor, value at key is the exponent value
     unordered_map<long long int, long long int> primeFactorsMap;
@@ -58,9 +59,9 @@ void primeFactorize(size_t n, vector<tuple<long long int, long long int>>& prime
 /// Relatively prime is if the gcd(`n`, #) = 1.
 /// @param n a `long long int`.
 /// @return the number of integers that are less than `n` that are relatively prime to `n`, a `long long int`.
-long long int eulerTotient(long long int n)
+size_t eulerTotient(size_t n)
 {
-    vector<tuple<long long int, long long int>> primeFactors;
+    vector<tuple<size_t, size_t>> primeFactors;
     primeFactorize(n, primeFactors);
 
     unsigned long long int numerator = 1;
@@ -86,7 +87,7 @@ long long int eulerTotient(long long int n)
 }
 
 
-long long int modPow(long long int b, long long int p, int m) 
+size_t modPow(size_t b, size_t p, size_t m) 
 {
     if (p == 0) 
         return 1; // base case
@@ -104,7 +105,7 @@ long long int modPow(long long int b, long long int p, int m)
 /// @param remainderVal the remainder of the modular, `size_t`.
 /// @param modVal the modular value, `size_t`.
 /// @return a `long long int`, `return's -1 if modular inverse is not possible`.
-long long int modularInverse(size_t a, size_t remainderVal, size_t modVal)
+size_t modularInverse(size_t a, size_t remainderVal, size_t modVal)
 {
     if (gcd(a, modVal) != 1)    // check if `a` and `modVal` are relatively prime to each other
         return -1;              // modular inverse is not possible, return -1
@@ -127,11 +128,24 @@ int main()
         iss = istringstream(input);
         size_t modVal, a;
         iss >> modVal >> a;
-        long long int x = modularInverse(a, 1, modVal);
-        if (x == -1 || (a == modVal)) // number of children == number of candies per bag -> impossible, or x == -1
-            outVec.push_back("IMPOSSIBLE");
+
+        if (modVal == 1)    // 1 child
+        {
+            if (a > 1)  // candy/bag is more than 1
+                outVec.push_back("1");
+            else        // candy/baf == 1, need 2 bags
+                outVec.push_back("2");
+        }
+        else if (a == 1)    // 1 candy per bag
+            outVec.push_back(to_string(modVal + 1));    // needed bags is #kids + 1
         else
-            outVec.push_back(to_string(x));
+        {
+            size_t x = modularInverse(a, 1, modVal);
+            if (x == -1) // if x == -1, then gcd(a, modVal) != 1
+                outVec.push_back("IMPOSSIBLE");
+            else
+                outVec.push_back(to_string(x));
+        }
     }
 
     for (string s : outVec)
@@ -142,3 +156,6 @@ int main()
 // 2^30 = 1073741824
 // phi(1073741824) = 536870912
 
+// Testing
+// cout << (((size_t)142857133 * (size_t)857142803) % (size_t)999999938) << endl;
+// cout << (((size_t)142857130 * (size_t)553571394) % (size_t)999999938) << endl;
