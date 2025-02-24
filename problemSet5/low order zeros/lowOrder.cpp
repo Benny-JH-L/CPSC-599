@@ -1,18 +1,28 @@
 
 /*
-https://open.kattis.com/problems/loworderzeros?tab=metadata
+https://open.kattis.com/problems/loworderzeros
 
+Passed all tests!
 */
 
-#include<stdio.h>
-#include<sstream>
-#include<iostream>
-#include<vector>
-#include<tuple>
-#include<unordered_map>
-#include<cmath>
+#include <stdio.h>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <unordered_map>
 
 using namespace std;
+
+long long int modPow(long long int b, long long int p, int m) 
+{
+    if (p == 0) 
+        return 1; // base case
+    long long ans = modPow(b, p/2, m);
+    ans = ans*ans % m;
+    if (p&1) {ans = ans*b % m;} // bitwise and
+    
+    return ans;
+}
 
 /// @brief Calculates the prime factors of the number `n`.
 /// @param n the number to be prime factored, an `long long int`.
@@ -49,204 +59,282 @@ void primeFactorize(size_t n, vector<tuple<int, int>>& primeFactorsOfN)
         primeFactorsOfN.push_back(tuple(pair.first, pair.second));
 }
 
+
 int main()
 {
-    // for (int i = 50; i > 0; i--)
-    //     cout << i<< endl;
-    
     unordered_map<size_t, size_t> cache;    // key: an number (n!) to compute low order digit of, Value: the low order digit
-    unordered_map<int, vector<tuple<int, int>>> primeFactorsCache;   // `key` a number to factorize, value, the prime factors
-
     cache[1] = 1;
     vector<string> outVec;
     string input;
     while(getline(cin, input) && input != "")
     {
         istringstream iss(input);
-        size_t num;
-        iss >> num;
+        size_t n;
+        iss >> n;
 
-        if (num == 0)
+        if (n == 0)
             break;
-        else if (cache.count(num))  // check if `num`!'s low order digit has been calculated before
+        else if (cache.count(n))  // check if `num`!'s low order digit has been calculated before
         {
-            outVec.push_back(to_string(cache[num]));
+            outVec.push_back(to_string(cache[n]));
+            // cout << cache[n] << endl;
             continue;
         }
 
-        unordered_map<size_t, size_t> powersCounter;    // Key is base, value is exponent 
-        for (size_t i = 2; i <= num; i++)
+        // compute n! while removing factors of 2 and 5 (we are essentially calculating n! using all other prime factors but those two)
+        int num2s = 0;
+        int num5s = 0;
+        size_t result = 1;
+        for (size_t i = 2; i <= n; i++) 
         {
-            // vector<tuple<size_t, size_t>> factors;
-            vector<tuple<int, int>> factors;
+            size_t num = i;
 
-            primeFactorize(i, factors);
-            
-            for (auto pair : factors)
+            // remove factors of 2 and 5 from `num`
+            while(num % 2 == 0)
             {
-                auto [base, pow] = pair;
-                powersCounter[base] += pow;
+                num = num / 2;
+                num2s++;
             }
-        }
+            while(num % 5 == 0)
+            {
+                num = num / 5;
+                num5s++;
+            }
 
-        // debug
-        // for (auto pair : powersCounter)
+            result = (result * num) % 10;    // remove leading digits (since we are removing all the 2's and 5's we won't have a trailing 0, ie have result = 0)
+        }
+        // take difference of powers of 2 and 5's exponents.
+        int extraTwos = num2s - num5s;
+        result = (result * modPow(2, extraTwos, 10)) % 10;  // account for remaining powers of 2 while removing trailing 0s.
+
+        cache[n] = result;    // add the result to the cache
+        outVec.push_back(to_string(result));
+
+        // Works too but much faster
+        // Compute the factorial's last non-zero digit
+        // int result = 1;
+        // int num2Divs = 0, num5Divs = 0;
+        // for (int i = 2; i <= n; i++) 
         // {
-        //     auto [base, expo] = pair;
-        //     cout << base << "^" << expo << endl;
+        //     int num = i;
+            
+        //     // Remove factors of 2 and 5
+        //     while (num % 2 == 0) {
+        //         num2Divs++;
+        //         num = num / 2;
+        //     }
+        //     while (num % 5 == 0) {
+        //         num5Divs++;
+        //         num = num / 5;
+        //     }
+            
+        //     // Multiply remaining part
+        //     if ((result * num) % 10 != 0)
+        //         result = (result * num) % 10;
         // }
-
-        // NOT FEASABLE FOR LARGE INPUTS! (will get overflow when multiplying)
-        size_t resultSoFar = 1;
-        for (auto pair : powersCounter)
-        {
-            auto [base, expo] = pair;
-            resultSoFar *= pow(base, expo);
-            while (resultSoFar % 10 == 0)  // remove trailing 0s
-                resultSoFar = resultSoFar / 10;
-        }
-
-        if (resultSoFar % 10 != 0)                  // remove leading digits
-            resultSoFar = resultSoFar % 10;
         
-        cache[num] = resultSoFar;   // add into the cache
-        outVec.push_back(to_string(resultSoFar));   // add to output
+        // // Adjust for extra factors of 2 (factors of 2 will > factors 5)
+        // int extraTwos = num2Divs - num5Divs;
+        // // for (int i = 0; i < extraTwos; i++) {
+        // //     result = (result * 2) % 10;
+        // // }
+        // result = (result * modPow(2, extraTwos, 10)) % 10;
+        // cache[n] = result;    // add the result to the cache
+        // outVec.push_back(to_string(result));
+
     }
 
     // print output
-    for (string s : outVec)
+    for (string& s : outVec)
         cout << s << endl;
     
     return 0;
 }
 
+        // // WORKS TOO: (but much slower), added caching for saving prime factors for `i` but still takes too long.
+        // unordered_map<int, unordered_map<int, int>> prevPrimeFactorCache; // key: prime factor of a number, value; prime factors of the number
 
-/*
-Test cases:
-3! -> 6
-25! = 15511210043330985984000000 -> 4
-492! = 3304..94810368000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 -> 8
-49! = 608281...0240000000000
+        // unordered_map<int, int> primeFactorsOfN;    // Key is base, value is exponent 
 
-*/
-        // compute the low order digit for `num`
-    //     size_t resultSoFar = 1;
-    //     for (size_t i = 2; i <= num; i++)
-    //     {
-    //         if (i == 200)
-    //             int num = 1;
-            
-    //         resultSoFar *= i;
-    //         while (resultSoFar % 10 == 0)  
-    //         {
-    //             resultSoFar = (resultSoFar / 10);   // remove trailing zeros
-    //             // if (resultSoFar % 10 != 0)          // remove leading digits 
-    //             // {
-    //             //     resultSoFar = resultSoFar % 10;
-    //             // }
-    //         }
-
-    //         // using 1 or the other will work for some cases but not for others...
-    //         // if (to_string(resultSoFar).length() > 2) // remove leading digits
-    //         // {
-    //         //     resultSoFar = resultSoFar % (size_t)100;
-    //         // }
-    //         if (to_string(resultSoFar).length() > 3) // remove leading digits
-    //         {
-    //             resultSoFar = resultSoFar % (size_t)1000;
-    //         }
-    //         // if (to_string(resultSoFar).length() > 4) // remove leading digits
-    //         // {
-    //         //     // while(resultSoFar >= 10000)
-    //         //     //     resultSoFar -= 10000;
-    //         //     resultSoFar = resultSoFar % (size_t)10000;
-    //         // }
-    //         // if (to_string(resultSoFar).length() > 5) // remove leading digits
-    //         // {
-    //         //     // while(resultSoFar >= 10000)
-    //         //     //     resultSoFar -= 10000;
-    //         //     resultSoFar = resultSoFar % (size_t)100000;
-    //         // }
-    //     }
-    //     if (resultSoFar % 10 != 0)                  // remove leading digits
-    //         resultSoFar = resultSoFar % 10;
-
-    //     cache[num] = resultSoFar;   // add into the cache
-    //     outVec.push_back(to_string(resultSoFar));   // add to output
-    // 
-        // inside `for-loop`
-        // ATTEMPT 3:
-          // FAILED ON 9000!
-        // size_t resultSoFar = 1;
-        // for (size_t i = 2; i <= num; i++)
+        // // compute all the prime factors that make up of n! (should also cache these results...)
+        // for (int i = 2; i <= n; i++) 
         // {
-        //     if (i == 200)
-        //         int num = 1;
-            
-        //     resultSoFar *= i;
-        //     while (resultSoFar % 10 == 0)  
+        //     // check if the prime factor of `i` has been calculated before
+        //     if (prevPrimeFactorCache.count(i))
         //     {
-        //         resultSoFar = (resultSoFar / 10);   // remove trailing zeros
-        //         if (resultSoFar % 10 != 0)          // remove leading digits 
+        //         // cout << "prime factors for " << i << " have been found already!" << endl;
+        //         unordered_map<int, int>& tmp = prevPrimeFactorCache[i];
+        //         for (auto& tup : tmp)
         //         {
-        //             resultSoFar = resultSoFar % 10;
+        //             auto& [base, expo] = tup;
+        //             primeFactorsOfN[base] += expo;
         //         }
+        //         continue;
+        //     }
+        //     // cout << "finding prime factors for " << i << endl;
+        //     // otherwise calculate `i` prime factors
+        //     vector<tuple<int, int>> primeFactors;
+        //     primeFactorize(i, primeFactors);
+        //     for (auto& tup : primeFactors)
+        //     {
+        //         auto& [base, expo] = tup;
+        //         primeFactorsOfN[base] += expo;
+        //         prevPrimeFactorCache[i][base] += expo;
         //     }
         // }
-        // if (resultSoFar % 10 != 0)                  // remove leading digits
-        //     resultSoFar = resultSoFar % 10;
+
+        // // multiply out the factorial using prime factors (excluding 2 and 5 as they will introdice trailing 0s quicker)
+        // size_t result = 1;
+        // for (auto& tup : primeFactorsOfN)
+        // {
+        //     auto& [base, expo] = tup;
+        //     if (base != 2 && base != 5)
+        //         result = (result * modPow(base, expo, 10)) % 10;
+        // }
+        // // take difference of powers of 2 and 5.
+        // int num2s = primeFactorsOfN[2];
+        // int num5s = primeFactorsOfN[5];
+        // int extraTwos = num2s - num5s;
+        // result = (result * modPow(2, extraTwos, 10)) % 10;
+
+        // cache[n] = result;    // add the result to the cache
+        // // outVec.push_back(to_string(result));
+        // cout << result << endl;
+
+// WORKS:
+        // Compute the factorial's last non-zero digit
+        // int result = 1;
+        // int num2Divs = 0, num5Divs = 0;
         
-        // Attempt 2: Failed 2nd case in submition
-        // size_t resultSoFar = num;
-        // for (size_t i = 2; i < num; i++)
+        // for (int i = 2; i <= n; i++) 
         // {
-        //     resultSoFar *= i;
-        //     while (resultSoFar % 10 == 0)  
-        //     {
-        //         resultSoFar = (resultSoFar / 10);   // remove trailing zeros
-        //         if (resultSoFar % 10 != 0)          // remove leading digits
-        //         {
-        //             resultSoFar = resultSoFar % 10;
-        //         }
+        //     int num = i;
+            
+        //     // Remove factors of 2 and 5
+        //     while (num % 2 == 0) {
+        //         num2Divs++;
+        //         num = num / 2;
         //     }
+        //     while (num % 5 == 0) {
+        //         num5Divs++;
+        //         num = num / 5;
+        //     }
+            
+        //     // Multiply remaining part
+        //     if ((result * num) % 10 != 0)
+        //         result = (result * num) % 10;
         // }
-        // if (resultSoFar % 10 != 0)                  // remove leading digits
-        //     resultSoFar = resultSoFar % 10;
+        
+        // // Adjust for extra factors of 2 (factors of 2 will > factors 5)
+        // int extraTwos = num2Divs - num5Divs;
+        // // for (int i = 0; i < extraTwos; i++) {
+        // //     result = (result * 2) % 10;
+        // // }
+        // result = (result * modPow(2, extraTwos, 10)) % 10;
+        // cache[n] = result;    // add the result to the cache
+        // outVec.push_back(to_string(result));
 
-        // (tried to do a diff implmentation to see some diff results)
-        // size_t resultSoFar = num;
-        // for (size_t i = 2; i < num; i++)
+
+        // no works
+        // for (int i = 2; i <= n; i++) 
+        // {
+        //     int tmp = i;
+
+        //     // remove factors of 2 and 5 
+        //     while (tmp % 5 == 0) {
+        //         num5Divs++;
+        //         tmp /= 5;
+        //     }
+        //     while (tmp % 2 == 0 && num5Divs > 0) {
+        //         countTwo++;
+        //         tmp /= 2;
+        //     }
+        //     if ((result * tmp) % 10 != 0 )
+        //     result = (result * tmp) % 10;
+        // }
+        // result = (result * modPow(2, num5Divs, 10)) % 10;
+
+        // // Compute the factorial's last non-zero digit
+        // size_t result = 1;
+        // int num5Divisions = 0;
+        // for (size_t i = 2; i <= n; i++)
         // {
         //     size_t tmp = i;
-        //     // while (tmp % 10 == 0)   // remove trailing 0s
-        //     //     tmp = tmp / 10;
-        //     if (tmp % 10 != 0)  // remove leading digits --?
-        //         tmp = tmp % 10;
-        //     resultSoFar *= tmp;
-        //     while (resultSoFar % 10 == 0)  
+
+        //     // remove factors of 5
+        //     while (tmp % 5 == 0)
         //     {
-        //         resultSoFar = (resultSoFar / 10);   // remove trailing zeros
-        //         if (resultSoFar % 10 != 0)  
-        //         {
-        //             resultSoFar = resultSoFar % 10;
-        //         }
+        //         tmp = tmp / 5;
+        //         num5Divisions++;
         //     }
+
+        //     // remove factors of 2 that complment the 5s divided earlier.
+        //     while (tmp % 2 == 0 && num5Divisions > 0)
+        //     {
+        //         tmp = tmp / 2;
+        //         num5Divisions--;
+        //     }
+
+        //     // if ((result * tmp) % 10 != 0)
+        //         result = (result * tmp) % 10;
         // }
 
-        // ATTTMPT 1 (DOES NOT WORK FOR ALL CASES I FOUND), and failed 2nd case in submition
-        // ssize_t resultSoFar = num;
-        // for (ssize_t i = num - 1; i > 0; i--)
-        // {
-        //     if (i == 4)
-        //         int s = 2;
-        //     resultSoFar *= i;
-        //     ssize_t modResult = resultSoFar % 10;
-        //     // if (modResult != 0)     // case 1: take the last digit (right most digit) 
-        //     //     resultSoFar = modResult;    // THIS IS NOT WORKING (RUN 25! EXAMPLE)
-        //     // else                    // case 2: remove the trailing 0s
-        //     // {
-        //         while (resultSoFar % 10 == 0)
-        //             resultSoFar = (resultSoFar / 10);
-        //         resultSoFar = resultSoFar % 10; // do a mod here to remove any significant digits
-        //     // }
+
+        // for (int i = 0; i < num5Divisions; i++) {
+        //     // if ((result * 5) % 10 != 0)
+        //         result = (result * 5) % 10;
         // }
+        // // result = (result * modPow(5, num5Divisions, 10) % 10);  // account for the remaining 5s while also removing trailing 0s.
+
+
+
+
+                // // Compute the factorial's last non-zero digit
+                // size_t result = 1;
+                // int num5Divisions = 0;
+        
+                // // int tmp2 = n;
+                // // while (tmp2 % 5 == 0)
+                // // {
+                // //     tmp2 = tmp2 / 5;
+                // //     num5Divisions++;
+                // // }
+                // for (size_t i = 2; i <= n; i++)
+                // {
+                //     size_t tmp = i;
+        
+                //     // remove factors of 5
+                //     while (tmp % 5 == 0)
+                //     {
+                //         tmp = tmp / 5;
+                //         num5Divisions++;
+                //     }
+        
+                //     while (tmp % 2 == 0 && num5Divisions > 0) {
+                //         tmp /= 2;
+                //         num5Divisions--;
+                //     }
+        
+                //     result = (result * tmp) % 10;
+                    
+                //     // result = result* tmp;
+                //     // while (result % 10 == 0)
+                //     //     result = result / 10;
+        
+                //     // if ((result * tmp) % 10 != 0)
+                //     //     result = (result * tmp) % 10;
+                // }
+        
+                // // Restore remaining 5s
+                // // for (int i = 0; i < num5Divisions; i++) {
+                // //     result = (result * 5) % 10;
+                // // }
+                // // for (int i = 0; i < num5Divisions; i++) {
+                // //     // if ((result * 5) % 10 != 0)
+                // //         result = (result * 5) % 10;
+                // // }
+                // result = (result * modPow(2, num5Divisions, 10) % 10);  // account for the remaining 5s while also removing trailing 0s.
+                // // result = (result * modPow(5, num5Divisions, 10) % 10);  // account for the remaining 5s while also removing trailing 0s.
+                // cache[n] = result;    // add the result to the cache
+                // outVec.push_back(to_string(result));
+

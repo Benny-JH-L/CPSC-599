@@ -75,6 +75,7 @@ int main()
             if (primeFacts.size() == 1 && expo == 1)    // `x` is prime
             {
                 outVec.push_back(to_string(x) + " " + to_string(counter));
+                // cout<<to_string(x) << " " << to_string(counter) << endl; // test
                 break;
             }
 
