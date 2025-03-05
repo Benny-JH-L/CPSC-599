@@ -18,14 +18,49 @@ vector<vector<int>> soldVec;
 // vector<vector<vector<int>>> cache;
 int cache[1010][310];
 
-int compute(int index, int remainingSeats, int fromPrice)
+// int compute(int index, int remainingSeats)
+// {
+//     if (index == W + 1)
+//         return 0;
+
+//     int result = 0;
+//     const vector<int>& pVec = pricesVec[index];
+//     const vector<int>& sVec  = soldVec[index];
+
+//     // Size of `pVec` and `sVec` will be the same
+//     // Compute the max profit for a week 
+//     for (int i = 0; i < pVec.size(); i++)
+//     {
+//         const int& price = pVec[i];
+//         const int& sold = sVec[i];
+//         if (cache[price][remainingSeats - sold] != -1) {
+//             cout << "optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << cache[price][remainingSeats - sold] << endl;
+//             return cache[price][remainingSeats - sold];
+//         }
+//         else if (sold <= remainingSeats) // still have seats to sell
+//         {
+//             const int r = compute(index + 1, remainingSeats - sold);  // Find the most profit that can be made with this ticket price sold + the remaining number of seats left.
+            
+//             // cache[price][remainingSeats - sold] = r;
+//             // cout << "optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << r << endl;
+
+//             // cout << "week<"<<index<<">optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << r << endl;
+
+//             result = max(result, sold*price + r);
+//             cache[price][remainingSeats - sold] = result;
+//             cout << "optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << result << endl;
+//         }
+//         else    // no more seats left to sell
+//             result = max(result, remainingSeats * price);
+//     }
+
+//     return result;
+// }
+
+int compute(int index, int remainingSeats)
 {
     if (index == W + 1)
         return 0;
-    else if (cache[fromPrice][remainingSeats] != -1) {    // check if we've already computed the optimal profit for price `fromPrice` with `remainingSeats` left. 
-        // cout << "hey! optimal profit for price<" << fromPrice << "> w/ seats remaining<" << remainingSeats << "> = " << cache[fromPrice][remainingSeats] << endl;
-        return cache[fromPrice][remainingSeats];
-    }
 
     int result = 0;
     const vector<int>& pVec = pricesVec[index];
@@ -37,22 +72,28 @@ int compute(int index, int remainingSeats, int fromPrice)
     {
         const int& price = pVec[i];
         const int& sold = sVec[i];
-        if (sold <= remainingSeats) // still have seats to sell
+        if (cache[price][remainingSeats - sold] != -1) {
+            // cout << "optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << cache[price][remainingSeats - sold] << endl;
+            return cache[price][remainingSeats - sold];
+        }
+        else if (sold <= remainingSeats) // still have seats to sell
         {
-            const int r = compute(index + 1, remainingSeats - sold, price);  // Find the most profit that can be made with this ticket price sold + the remaining number of seats left.
+            const int r = compute(index + 1, remainingSeats - sold);  // Find the most profit that can be made with this ticket price sold + the remaining number of seats left.
             
-            cache[price][remainingSeats - sold] = r;
+            // cache[price][remainingSeats - sold] = r;
             // cout << "optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << r << endl;
 
             // cout << "week<"<<index<<">optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << r << endl;
 
-
             result = max(result, sold*price + r);
+            cache[price][remainingSeats - sold] = result;
+            // cout << "optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << result << endl;
         }
         else    // no more seats left to sell
         {
             result = max(result, remainingSeats * price);
-            cache[price][0] = 0;
+            result = max(result, compute(index + 1, remainingSeats));
+            cache[price][0] = result;
         }
     }
 
@@ -131,43 +172,29 @@ int main()
     // }
 
     memset(cache, -1, sizeof(cache));
-    int max_profit = compute(0, N, 0);
+    int max_profit = compute(0, N);
     cout << max_profit << endl;
 
-    // Find the ticket price to set for the current week 
-    // for (int i = 0; i < pricesVec[0].size(); i++)
-    // {
-    //     int price = pricesVec[0][i];
-    //     int sold = soldVec[0][i];
-    //     int minSold = min(N, sold);
-    //     int profit = minSold * price;
-    //     // if (compute(1, N - minSold, price, sold) + profit == max_profit)
-    //     if (compute(0, N - minSold, price) + profit == max_profit)
-    //     {
-    //         cout << price << endl;
-    //         break;
-    //     }
-    // }
-    
-    // cout <<"\n(note: not inc the profit for this ticket itself)"<< endl; // debug
-
     int set_price = 10e8;
+    // Find the ticket price to set for the current week 
     for (int i = 0; i < pricesVec[0].size(); i++)
     {
         int price = pricesVec[0][i];
         int sold = soldVec[0][i];
         int minSold = min(N, sold);
-        int profitForThisTicket = minSold * price;
 
-        // cout << "cache["<<price<<"]["<<N-minSold<<"] = "<< cache[price][N - minSold] << endl;   // debug
-
-        if (cache[price][N - minSold] + profitForThisTicket == max_profit)
+        if (cache[price][N - minSold] == max_profit)
         {
-            set_price = min(set_price, price);
+            set_price = min(price, set_price);
         }
 
-        // // if (compute(1, N - minSold, price, sold) + profit == max_profit)
-        // if (compute(0, N - minSold, price) + profit == max_profit)
+
+        // int profit = minSold * price;
+        // if (compute(1, N - minSold, price, sold) + profit == max_profit)
+        // int l = compute(0, N - minSold);
+        // cout << "hey: " << l << endl;
+        // // if (compute(0, N - minSold) == max_profit)
+        // if (l == max_profit)
         // {
         //     cout << price << endl;
         //     break;

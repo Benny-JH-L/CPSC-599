@@ -134,6 +134,8 @@ int main()
     int max_profit = compute(0, N, 0);
     cout << max_profit << endl;
 
+    cache[0][N] = max_profit;
+
     // Find the ticket price to set for the current week 
     // for (int i = 0; i < pricesVec[0].size(); i++)
     // {

@@ -1,0 +1,162 @@
+
+/*
+https://open.kattis.com/problems/ticketpricing
+
+*/
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <sstream>
+
+using namespace std;
+
+int N, W;
+vector<vector<int>> pricesVec;
+vector<vector<int>> soldVec;
+// vector<vector<int>> cache;
+vector<vector<vector<int>>> cache;
+
+int compute(int index, int remainingSeats, int fromPrice, int fromSold)
+{
+    if (index == W + 1)
+        return 0;
+    // else if (cache[index][fromPrice][fromSold] != -1) {    // check if we've already computed the optimal profit for price `fromPrice` with its associated tickets sold `fromSold` 
+    //     // cout << "optimal profit for price<" << fromPrice << "> w/ seats sold<" << fromSold << "> = " << cache[fromPrice][fromSold] << endl;
+    //     cout << "optimal profit for price<" << fromPrice << "> w/ seats sold<" << fromSold << "> = " << cache[index][fromPrice][fromSold] << endl;
+    //     return cache[index][fromPrice][fromSold];
+    // }
+    else if (cache[index][fromPrice][remainingSeats] != -1) {    // check if we've already computed the optimal profit for price `fromPrice` with its associated tickets sold `fromSold` 
+        // cout << "optimal profit for price<" << fromPrice << "> w/ seats sold<" << fromSold << "> = " << cache[fromPrice][fromSold] << endl;
+        cout << "hey! week<"<<index<<">optimal profit for price<" << fromPrice << "> w/ seats remaining<" << remainingSeats << "> = " << cache[index][fromPrice][remainingSeats] << endl;
+        return cache[index][fromPrice][remainingSeats];
+    }
+
+    int result = 0;
+    vector<int> pVec = pricesVec[index];
+    vector<int> sVec  = soldVec[index];
+
+    // Size of `pVec` and `sVec` will be the same
+    // Compute the max profit for a week 
+    for (int i = 0; i < pVec.size(); i++)
+    {
+        int price = pVec[i];
+        int sold = sVec[i];
+        if (sold <= remainingSeats) // still have seats to sell
+        {
+            int r = compute(index + 1, remainingSeats - sold, price, sold);  // Find the most profit that can be made with this ticket price sold + the remaining number of seats left.
+            
+            cache[index][price][remainingSeats - sold] = r;
+            cout << "week<"<<index<<">optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats - sold << "> = " << r << endl;
+
+            result = max(result, sold*price + r);
+            // result = max(result, r);
+        }
+        else    // no more seats left to sell
+            result = max(result, remainingSeats * price);
+        // cout << "curr result: " << result << endl;
+        // cache[price][sold] = result;
+
+        // cache[index][price][remainingSeats] = result;
+        // cout << "week<"<<index<<">optimal profit for price<" << price << "> w/ seats remaining<" << remainingSeats << "> = " << cache[index][price][remainingSeats] << endl;
+    }
+
+    // cache[fromPrice][fromSold] = result;
+    // return cache[fromPrice][fromSold];
+
+    // cache[index][fromPrice][fromSold] = result;
+    // return cache[index][fromPrice][fromSold];
+    return result;
+}
+
+int main()
+{
+    string input;
+    getline(cin, input);
+    istringstream iss = istringstream(input);
+    iss >> N >> W;
+    int tmpW = W;
+    while(tmpW + 1 > 0 && getline(cin, input))
+    {
+        iss = istringstream(input);
+        int num;
+        vector<int> lineValues;
+        while (iss >> num)
+            lineValues.emplace_back(num);
+        lineValues.erase(lineValues.begin());   // remove 1st element
+        vector<int> tmp;
+        // first half of the line will be ticket prices
+        for (int i = 0; i < lineValues.size() / 2; i++)
+            tmp.emplace_back(lineValues[i]);
+        vector<int> tmp2;
+        // second half of the line will be seats sold for the associated ticket price
+        for  (int i = lineValues.size() / 2; i < lineValues.size(); i++)
+            tmp2.emplace_back(lineValues[i]);
+        
+        pricesVec.emplace_back(tmp);
+        soldVec.emplace_back(tmp2);
+        tmpW--;
+    }
+
+    // cout << "Prices: " << endl;
+    // for (auto& v : pricesVec)
+    // {
+    //     cout << "[";
+    //     for (auto& i : v)
+    //         cout << i << ", ";
+    //     cout << "]" << endl;
+    // }
+
+    // cout << "Sold tickets: " << endl;
+    // for (auto& v : soldVec)
+    // {
+    //     cout << "[";
+    //     for (auto& i : v)
+    //         cout << i << ", ";
+    //     cout << "]" << endl;
+    // }
+
+    // row = price
+    // col = seat
+    // cache[row][col] = optimal price
+    // for (int i = 0; i <= 1010; i++)
+    //     cache.emplace_back(vector<int>(53, -1));
+
+    // cout << "Cache:" << endl;     
+    // for (int i = 0; i < cache.size(); i++)
+    // {
+    //     for (auto& v : cache[i])
+    //         cout << v << " ";
+    //     cout << endl;
+    // }
+
+    // w = week
+    // i = price
+    // j = seat
+    for (int w = 0; w <= 53; w++)
+    {
+        cache.emplace_back(vector<vector<int>>());
+        for (int i = 0; i <= 1010; i++)
+            cache[w].emplace_back(vector<int>(310, -1));
+    }
+
+    int max_profit = compute(0, N, 0, 0);
+    cout << max_profit << endl;
+
+    // Find the ticket price to set for the current week 
+    for (int i = 0; i < pricesVec[0].size(); i++)
+    {
+        int price = pricesVec[0][i];
+        int sold = soldVec[0][i];
+        int minSold = min(N, sold);
+        int profit = minSold * price;
+        // if (compute(1, N - minSold, price, sold) + profit == max_profit)
+        if (compute(0, N - minSold, price, sold) + profit == max_profit)
+        {
+            cout << price << endl;
+            break;
+        }
+    }
+
+    return 0;
+}
