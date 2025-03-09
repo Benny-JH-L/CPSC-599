@@ -1,0 +1,298 @@
+
+// /*
+// https://open.kattis.com/problems/keyboardconcert
+// */
+
+// #include <bits/stdc++.h>
+// #include<sstream>
+// #include<set>
+// #include<vector>
+
+// using namespace std;
+
+// const int N = 1010, M = 1010, inf = 1e5;
+// int minSoFar = inf;
+
+// vector<set<int>> instruments;
+// // ssize_t cache[N][M];
+// int cache[N][M];
+// vector<int> sequence;
+
+// // int dp(int indexKeyboard, int indexSeq, int switches)
+// // {
+// //     if (indexSeq >= sequence.size())
+// //         return 0;
+// //     else if (cache[indexKeyboard][indexSeq] != inf)
+// //         return cache[indexKeyboard][indexSeq];
+// //     else if (switches > minSoFar)
+// //         return inf;
+// //     if (!instruments[indexKeyboard].count(sequence[indexSeq]))
+// //     {
+// //         int mini = inf;
+// //         for (int i = 0; i < instruments.size(); i++)
+// //         {
+// //             ssize_t result = inf;
+// //             if (i != indexKeyboard && instruments[i].count(sequence[indexSeq]))
+// //             {
+// //                 result = dp(i, indexSeq, switches + 1) + 1;
+// //                 // cache[i][indexSeq] = max(result, cache[i][indexSeq]);
+// //             }
+
+// //             mini = min(mini, int(result));
+// //         }
+// //         cache[indexKeyboard][indexSeq] = mini;
+// //         return mini;
+// //     }
+    
+// //     return dp(indexKeyboard, indexSeq + 1, switches);
+// // }
+
+// int dp(int indexKeyboard, int indexSeq)
+// {
+//     if (indexSeq >= sequence.size())
+//         return 0;
+    
+//     else if (cache[indexKeyboard][indexSeq] != inf)
+//         return cache[indexKeyboard][indexSeq];
+    
+//     else if (instruments[indexKeyboard].count(sequence[indexSeq]))
+//     {
+//         cache[indexKeyboard][indexSeq] = dp(indexKeyboard, indexSeq + 1);
+//         return cache[indexKeyboard][indexSeq];
+//     }
+//     else
+//     {
+//         int mini = inf;
+//         for (int i = 0; i < instruments.size(); i++)
+//         {
+//             if (i != indexKeyboard && instruments[i].count(sequence[indexSeq]))
+//             {
+//                 mini = min(mini, dp(i, indexSeq + 1) + 1);
+//             }
+//         }
+//         cache[indexKeyboard][indexSeq] = mini;
+//         return mini;
+//     }
+// }
+
+// int main()
+// {
+//     int n, m;
+//     cin >> n >> m;
+
+//     for(int i = 0; i < n; i++)
+//     {
+//         int num, note;
+//         cin >> num;
+//         set<int> s;
+//         for (;num > 0; num--)
+//         {
+//             cin >> note;
+//             s.insert(note);
+//         }
+//         instruments.emplace_back(s);
+//     }
+
+//     for (int i = 0, note; i < m; i++)
+//     {
+//         cin >> note;
+//         sequence.emplace_back(note);
+//     }
+    
+//     // cout << endl;
+//     // for (auto& s : instruments)
+//     // {
+//     //     for (auto& i : s)
+//     //         cout << i << " ";
+//     //     cout << endl;
+//     // }
+//     // cout << endl;
+//     // for (auto& i : sequence)
+//     //     cout << i << " ";
+
+
+//     for (ssize_t i = 0; i < N; i++)
+//     {
+//         for (ssize_t j = 0; j < M; j++)
+//             cache[i][j] = inf;
+//     }
+
+//     // memset(cache, inf, sizeof(cache));
+
+
+//     int swaps = inf;
+//     for (int i = 0; i < instruments.size(); i++) 
+//     {
+//         swaps = min(swaps, dp(i, 0));
+//         // swaps = min(swaps, dp(i, 0, 0));
+//         // minSoFar = swaps;
+//     }
+//     cout << swaps << endl;
+
+//     // for (ssize_t i = 0; i < N; i++)
+//     // {
+//     //     for (ssize_t j = 0; j < M; j++)
+//     //         cout << "cache[" <<i << "]["<< j<< "] = " << cache[i][j] << endl;;
+//     // }
+
+//     return 0;
+// }
+
+
+// // // int dp(ssize_t cache[][], int seq[], set<int>& keyboard, int indexSeq)
+// // int dp(set<int>& keyboard, int indexSeq)
+// // {
+// //     if (indexSeq >= sequence.size())
+// //         return 0;
+// //     if (!keyboard.count(sequence[indexSeq]))
+// //     {
+// //         int mini = inf;
+// //         for (set<int> next : instruments)
+// //         {
+// //             int result = inf;
+// //             if (next != keyboard)
+// //                 // result = dp(cache, seq, next, indexSeq) + 1;
+// //                 result = dp(next, indexSeq) + 1;
+
+// //             mini = min(mini, result);
+// //         }
+// //         return mini;
+// //     }
+    
+// //     // return dp(cache, seq, keyboard, indexSeq + 1);
+// //     return dp(keyboard, indexSeq + 1);
+// // }
+
+// // int main()
+// // {
+// //     int n, m;
+// //     cin >> n >> m;
+
+// //     for(int i = 0; i < n; i++)
+// //     {
+// //         int num, note;
+// //         cin >> num;
+// //         set<int> s;
+// //         for (;num > 0; num--)
+// //         {
+// //             cin >> note;
+// //             s.insert(note);
+// //         }
+// //         instruments.emplace_back(s);
+// //     }
+
+// //     for (int i = 0, note; i < m; i++)
+// //     {
+// //         cin >> note;
+// //         sequence.emplace_back(note);
+// //     }
+    
+// //     // cout << endl;
+// //     // for (auto& s : instruments)
+// //     // {
+// //     //     for (auto& i : s)
+// //     //         cout << i << " ";
+// //     //     cout << endl;
+// //     // }
+// //     // cout << endl;
+// //     // for (auto& i : sequence)
+// //     //     cout << i << " ";
+
+// //     int swaps = inf;
+// //     for (int i = 0; i < instruments.size(); i++)
+// //         // swaps = min(swaps, dp(cache, sequence, i, 0));
+// //         swaps = min(swaps, dp(instruments[i], 0));
+    
+// //     cout << swaps << endl;
+
+// //     return 0;
+// // }
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    // Map each note to the instruments that can play it
+    unordered_map<int, vector<int>> note_to_instruments;
+    for (int i = 0; i < n; i++) {
+        int k;
+        cin >> k;
+        for (int j = 0; j < k; j++) {
+            int note;
+            cin >> note;
+            note_to_instruments[note].push_back(i);
+        }
+    }
+
+    // for (auto i : note_to_instruments)
+    // {
+    //     auto [note, vec] = i;
+    //     cout << "vec indicies that can play note["<<note<<"]: "<<endl;
+    //     for (auto v : vec)
+    //         cout << v << " ";
+        
+    //     cout << endl;
+    // }
+    // cout << endl;
+
+    // Read the sequence of notes
+    vector<int> sequence(m);
+    for (int i = 0; i < m; i++) {
+        cin >> sequence[i];
+    }
+
+    // // If any note cannot be played by any instrument, output -1
+    // for (int note : sequence) {
+    //     if (note_to_instruments.find(note) == note_to_instruments.end()) {
+    //         cout << -1 << endl;
+    //         return 0;
+    //     }
+    // }
+
+    // Greedy approach to minimize switches
+    int switches = 0;
+    int current_instrument = -1;
+
+    for (int i = 0; i < m; ) {
+        // Find the instrument that can play the longest subsequence starting from note i
+        int max_length = 0;
+        int best_instrument = -1;
+
+        // Try all instruments that can play the current note
+        for (int instr : note_to_instruments[sequence[i]]) {
+            int length = 0;
+            // Check how many consecutive notes this instrument can play
+            while (i + length < m && find(note_to_instruments[sequence[i + length]].begin(),
+                                          note_to_instruments[sequence[i + length]].end(), instr) != note_to_instruments[sequence[i + length]].end()) {
+                length++;
+            }
+            // Update the best instrument
+            if (length > max_length) {
+                max_length = length;
+                best_instrument = instr;
+            }
+        }
+
+        // // If no instrument can play the current note, output -1
+        // if (best_instrument == -1) {
+        //     cout << -1 << endl;
+        //     return 0;
+        // }
+
+        // Switch to the best instrument
+        if (best_instrument != current_instrument) {
+            switches++;
+            current_instrument = best_instrument;
+        }
+
+        // Move to the next note after the longest subsequence
+        i += max_length;
+    }
+
+    // Output the number of switches
+    cout << (switches - 1 == -1 ? 0 : switches - 1) << endl; // Subtract 1 because the first instrument doesn't count as a switch
+    return 0;
+}
