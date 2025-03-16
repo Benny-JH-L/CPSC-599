@@ -1,0 +1,1 @@
+{"name":"Local: cla","url":"c:\\Users\\Benny\\Documents\\GitHub\\CPSC-599\\problemSet8\\tautology\\cla.cpp","tests":[{"id":1742079468999,"input":"ApNp\nApNq\n0\n","output":"tautology\nnot\n"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\Benny\\Documents\\GitHub\\CPSC-599\\problemSet8\\tautology\\cla.cpp","group":"local","local":true}
