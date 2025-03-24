@@ -1,0 +1,1 @@
+{"name":"Local: uf","url":"c:\\Users\\Benny\\Documents\\GitHub\\CPSC-599\\problemSet9\\Union-find\\uf.py","tests":[{"id":1742778313424,"input":"10 4\n? 1 3\n= 1 8\n= 3 8\n? 1 3\n","output":"no\nyes\n"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"c:\\Users\\Benny\\Documents\\GitHub\\CPSC-599\\problemSet9\\Union-find\\uf.py","group":"local","local":true}
