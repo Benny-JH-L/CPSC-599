@@ -9,6 +9,7 @@ https://ucalgary.kattis.com/courses/CPSC_599-4/Winter_2025/assignments/bcty6b/pr
 
 using namespace std;
 
+// O(alpha(n)), where alpha(n) is the inverse Ackermann function (almost constant).
 class DisjointSet 
 {
 private:
